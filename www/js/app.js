@@ -45,22 +45,22 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 
   // Each tab has its own nav history stack:
 
-  .state('tab.dash', {
-    url: '/dash',
+  .state('tab.search', {
+    url: '/search',
     views: {
-      'tab-dash': {
-        templateUrl: 'templates/tab-dash.html',
-        controller: 'DashCtrl'
+      'tab-search': {
+        templateUrl: 'templates/tab-search.html',
+        controller: 'SearchCtrl'
       }
     }
   })
 
-  .state('tab.chats', {
-      url: '/chats',
+  .state('tab.edit', {
+      url: '/edit',
       views: {
-        'tab-chats': {
-          templateUrl: 'templates/tab-chats.html',
-          controller: 'ChatsCtrl'
+        'tab-edit': {
+          templateUrl: 'templates/tab-edit.html',
+          controller: 'EditCtrl'
         }
       }
     })
@@ -85,6 +85,25 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
   });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/dash');
+  $urlRouterProvider.otherwise('/tab/search');
 
-});
+})
+
+.factory('spotifyAPI', ['$http', function($http) {
+
+  var urlBase = 'https://api.spotify.com/v1/search';
+  var spotifyFactory = {};
+
+  spotifyFactory.searchAlbum = function (album) {
+    return $http.get(urlBase + '?q=' + album + '&type=album');
+  };
+
+      spotifyFactory.searchTrack = function (track) {
+        return $http.get(urlBase + '?q=' + track + '&type=track');
+      };
+
+      spotifyFactory.searchPlaylist = function (playlist) {
+        return $http.get(urlBase + '?q=' + playlist + '&type=playlist');
+      };
+  return spotifyFactory;
+}]);
