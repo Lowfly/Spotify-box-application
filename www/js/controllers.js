@@ -60,8 +60,27 @@ angular.module('sb.controllers', ['ngResource'])
         }
     })
 
-    .controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
-        $scope.chat = Chats.get($stateParams.chatId);
+    .controller('ChatDetailCtrl', function($scope, $stateParams) {
+
+        console.log($stateParams.result);
+
+        console.log($scope.uri);
+       /* var spotifyAPI = $resource($scope.uri);
+
+        spotifyAPI.get().$promise.then(function (content) {
+            // success
+
+            $scope.content = {};
+
+            $scope.content.name = content.name;
+            $scope.content.artists = content.artists;
+            $scope.content.album = content.album.name;
+            $scope.content.cover = content.album.images[1].url;
+
+            console.log($scope.content);
+        }, function (errResponse) {
+            console.log('error');
+        });*/
     })
 
     .controller('EditCtrl', function ($scope, $ionicLoading, nfcService) {
