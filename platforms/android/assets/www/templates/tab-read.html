@@ -9,34 +9,16 @@
     </div>
     <div ng-if="tag.id">
       <div class="card">
-        <div class="item item-text-wrap">
-          <dl>
-            <dt>Tag Id</dt>
-            <dd>{{ tag.id | bytesToHexString }}</dd>
-            <dt>Tag Type</dt>
-            <dd>{{ tag.type }}</dd>
-            <!-- TODO techTypes -->
-            <dt>Max Size</dt>
-            <dd>{{ tag.maxSize }} bytes</dd>
-            <dt>Is Writable</dt>
-            <dd>{{ tag.isWritable }}</dd>
-            <dt>Can Make Read Only</dt>
-            <dd>{{ tag.canMakeReadOnly }}</dd>
-          </dl>
-          <div class="card" ng-repeat="record in tag.ndefMessage">
-            <div class="item item-divider">
-              Record {{$index + 1}} <br/>
-            </div>
+          <div class="card" style='text-align: center; padding: 20px'>
+            <img src={{content.cover}} alt="Smiley face" height="250" width="250" align="middle">
             <div class="item item-text-wrap">
               <dl>
-                <dt>TNF</dt>
-                <dd>{{ record.tnf | tnfToString }}</dd>
-                <dt>Record Type</dt>
-                <dd>{{ record.type | bytesToString }}</dd>
-                <dt ng-if="record.id">Record Id</dt>
-                <dd ng-if="record.id">{{ record.id | bytesToString }}</dd>
-                <dt>Payload</dt>
-                <dd>{{ record | decodePayload }}</dd>
+                <dt>Name</dt>
+                <dd>{{ content.name }}</dd>
+                <dt>Album</dt>
+                <dd>{{ content.album}}</dd>
+                <dt>Artist</dt>
+                <dd ng-repeat="artist in content.artists">{{ artist.name }}</dd>
               </dl>
             </div>
           </div>

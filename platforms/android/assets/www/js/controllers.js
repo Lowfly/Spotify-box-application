@@ -1,4 +1,4 @@
-angular.module('sb.controllers', [])
+angular.module('sb.controllers', ['ngResource'])
 
     .controller('SearchCtrl', function ($scope, spotifyAPI) {
 
@@ -86,7 +86,7 @@ angular.module('sb.controllers', [])
         $scope.chat = Chats.get($stateParams.chatId);
     })
 
-    .controller('ReadCtrl', function ($scope, $ionicLoading, nfcService) {
+    .controller('ReadCtrl', function ($scope, $ionicLoading, $resource, nfcService) {
         $scope.spotify_uri = {};
 
         $scope.tag = nfcService.readUri().then(function (data) {
@@ -109,7 +109,7 @@ angular.module('sb.controllers', [])
             console.log(spotify_array.length);
             if (spotify_array.length == 3) {
                 if (spotify_array[0] == 'spotify' && spotify_array[1] == 'track' ||
-                    spotify_array[1] == 'album' || spotify_array[1] == 'playlist') {
+                    spotify_array[1] == 'album') {
                     return true
                 }
                 return false
@@ -121,17 +121,26 @@ angular.module('sb.controllers', [])
         }
 
         function getContent(spotify_array) {
-            if (spotify_array[1] == 'track'){
-                console.log("it's a track");
-            }
-            else if (spotify_array[1] == 'album'){
-                console.log("it's an album");
+            var spotifyAPI = $resource('https://api.spotify.com/v1/:type/:id', {type: '@type'}, {id: '@id'});
 
-            }
-            else if (spotify_array[1] == 'playlist'){
-                console.log("it's a playlist");
+            spotifyAPI.get({type: spotify_array[1] + 's', id: spotify_array[2]}).$promise.then(function(content) {
+                // success
 
-            }
+                $scope.content = {};
+                console.log(content.name);
+                console.log(content.artists);
+                console.log(content.album.name);
+                console.log(content.album.images[1].url);
+
+                $scope.content.name = content.name;
+                $scope.content.artists = content.artists;
+                $scope.content.album = content.album.name;
+                $scope.content.cover = content.album.images[1].url;
+
+                console.log($scope.content);
+            }, function(errResponse) {
+                console.log('error');
+            });
         }
 
 
