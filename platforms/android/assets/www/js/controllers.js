@@ -40,6 +40,30 @@ angular.module('sb.controllers', ['ngResource'])
         }
     })
 
+    .controller('ChatsCtrl', function($scope, Chats, $resource) {
+
+        $scope.currentSearchList = {};
+
+        $scope.search = function (input) {
+            $scope.encodedInput = encodeURI(input);
+
+            var spotifyAPI = $resource('https://api.spotify.com/v1/search?q=:encodedInput&type=:type', {encodedInput: '@encodedInput'}, {type: '@type'});
+
+            spotifyAPI.get({encodedInput: $scope.encodedInput, type: 'track'}).$promise.then(function (result) {
+
+                cordova.plugins.Keyboard.close();
+                $scope.results = result.tracks.items;
+
+            }, function (errResponse) {
+                console.log('error');
+            });
+        }
+    })
+
+    .controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
+        $scope.chat = Chats.get($stateParams.chatId);
+    })
+
     .controller('EditCtrl', function ($scope, $ionicLoading, nfcService) {
         // With the new view caching in Ionic, Controllers are only called
         // when they are recreated or on app start, instead of every page change.
