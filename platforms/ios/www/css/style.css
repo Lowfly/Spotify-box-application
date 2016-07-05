@@ -1,1 +1,10 @@
 /* Empty. Add your own CSS if you like */
+
+.nav-spotify-color {
+    background-color: #393939 !important;
+}
+
+.bar .bar-stable .title {
+    color: #AAAA9E !important;
+}
+

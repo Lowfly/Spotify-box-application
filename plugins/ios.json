@@ -9,6 +9,9 @@
     "installed_plugins": {
         "phonegap-nfc": {
             "PACKAGE_NAME": "com.ionicframework.starter"
+        },
+        "ionic-plugin-keyboard": {
+            "PACKAGE_NAME": "com.ionicframework.starter"
         }
     },
     "dependent_plugins": {}
