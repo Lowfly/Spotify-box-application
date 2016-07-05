@@ -61,7 +61,7 @@ angular.module('sb', ['ionic', 'sb.controllers', 'sb.services', 'sb.filters', 'n
                 url: '/search',
                 views: {
                     'tab-search': {
-                        templateUrl: 'templates/tab-chats.html',
+                        templateUrl: 'templates/tab-search.html',
                         controller: 'SearchCtrl'
                     }
                 }
@@ -71,7 +71,7 @@ angular.module('sb', ['ionic', 'sb.controllers', 'sb.services', 'sb.filters', 'n
                 url: '/search/:result',
                 views: {
                     'tab-search': {
-                        templateUrl: 'templates/chat-detail.html',
+                        templateUrl: 'templates/search-detail.html',
                         controller: 'SearchDetailCtrl'
                     }
                 }
