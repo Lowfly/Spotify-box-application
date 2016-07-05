@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-angular.module('nfcFilters', [])
+angular.module('sb.filters', [])
     .filter('bytesToHexString', function() {
         return function (input) {
             if (window.nfc) {
@@ -31,6 +31,13 @@ angular.module('nfcFilters', [])
                 return input;
             }
         };
+    })
+
+    .filter('splitPayload', function() {
+        return function(input, splitChar, splitIndex) {
+            // do some bounds checking here to ensure it has that index
+            return input.split(splitChar)[splitIndex];
+        }
     })
 
     .filter('tnfToString', function() {

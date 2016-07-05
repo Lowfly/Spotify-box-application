@@ -1,4 +1,4 @@
-angular.module('starter.controllers', [])
+angular.module('sb.controllers', [])
 
     .controller('SearchCtrl', function ($scope, spotifyAPI) {
 
@@ -86,10 +86,54 @@ angular.module('starter.controllers', [])
         $scope.chat = Chats.get($stateParams.chatId);
     })
 
-    .controller('ReadCtrl', function ($scope,$ionicLoading,  nfcService) {
+    .controller('ReadCtrl', function ($scope, $ionicLoading, nfcService) {
+        $scope.spotify_uri = {};
 
         $scope.tag = nfcService.readUri().then(function (data) {
-            console.log("data : " + data);
             $scope.tag = data;
-        })
-    });
+
+            $scope.spotify_uri.uri = ndef.uriHelper.decodePayload($scope.tag.ndefMessage[0].payload);
+
+            $scope.spotify_uri.array = splitPayload($scope.spotify_uri.uri);
+
+            if (!isValidUri($scope.spotify_uri.array)){
+                alert("Tag ou URI non valide");
+                return;
+            }
+
+            getContent($scope.spotify_uri.array);
+        });
+
+
+        function isValidUri(spotify_array) {
+            console.log(spotify_array.length);
+            if (spotify_array.length == 3) {
+                if (spotify_array[0] == 'spotify' && spotify_array[1] == 'track' ||
+                    spotify_array[1] == 'album' || spotify_array[1] == 'playlist') {
+                    return true
+                }
+                return false
+            }
+        }
+
+        function splitPayload(spotify_uri) {
+            return spotify_uri.split(':');
+        }
+
+        function getContent(spotify_array) {
+            if (spotify_array[1] == 'track'){
+                console.log("it's a track");
+            }
+            else if (spotify_array[1] == 'album'){
+                console.log("it's an album");
+
+            }
+            else if (spotify_array[1] == 'playlist'){
+                console.log("it's a playlist");
+
+            }
+        }
+
+
+    })
+;

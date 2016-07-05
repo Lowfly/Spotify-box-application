@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'nfcFilters'])
+angular.module('sb', ['ionic', 'sb.controllers', 'sb.services', 'sb.filters'])
 
     .run(function ($ionicPlatform) {
         $ionicPlatform.ready(function () {
@@ -86,79 +86,5 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
 
         // if none of the above states are matched, use this as the fallback
         $urlRouterProvider.otherwise('/tab/search');
-
-    })
-
-    .factory('spotifyAPI', ['$http', function ($http) {
-
-        var urlBase = 'https://api.spotify.com/v1/search';
-        var spotifyFactory = {};
-
-        spotifyFactory.searchAlbum = function (album) {
-            return $http.get(urlBase + '?q=' + album + '&type=album');
-        };
-
-        spotifyFactory.searchTrack = function (track) {
-            return $http.get(urlBase + '?q=' + track + '&type=track');
-        };
-
-        spotifyFactory.searchPlaylist = function (playlist) {
-            return $http.get(urlBase + '?q=' + playlist + '&type=playlist');
-        };
-        return spotifyFactory;
-    }])
-
-    .factory('nfcService', function ($q, $timeout) {
-
-        var writeUri = function (spotify_uri) {
-            var deferred = $q.defer();
-
-            nfc.addNdefListener(function (nfcEvent) {
-
-                //console.log(JSON.stringify(nfcEvent));
-                console.log("Read tag : " + JSON.stringify(nfcEvent.tag.id, null, 4));
-
-                var message = [ndef.textRecord(spotify_uri)];
-
-                nfc.write(message, function () {
-                    console.log("success");
-                    deferred.resolve(nfcEvent);
-                }, function () {
-                    console.log("failure");
-                    deferred.reject("Fail writing");
-                });
-
-            }, function () {
-                console.log("Listening for NDEF Tags.");
-            }, function (reason) {
-                alert("Error adding NFC Listener " + reason);
-            });
-
-            return deferred.promise;
-        };
-
-        var readUri = function () {
-            var deferred = $q.defer();
-
-            nfc.addNdefListener(function (nfcEvent) {
-
-                //console.log(JSON.stringify(nfcEvent));
-                console.log("Read tag : " + JSON.stringify(nfcEvent.tag.id, null, 4));
-
-                deferred.resolve(nfcEvent.tag);
-
-            }, function () {
-                console.log("Listening for NDEF Tags.");
-            }, function (reason) {
-                alert("Error adding NFC Listener " + reason);
-            });
-
-            return deferred.promise;
-        };
-
-        return {
-            writeUri: writeUri,
-            readUri: readUri
-        };
 
     });
