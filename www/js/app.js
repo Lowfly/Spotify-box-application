@@ -61,7 +61,7 @@ angular.module('sb', ['ionic', 'sb.controllers', 'sb.services', 'sb.filters', 'n
                 url: '/search',
                 views: {
                     'tab-search': {
-                        templateUrl: 'templates/tab-search.html',
+                        templateUrl: 'templates/tab-chats.html',
                         controller: 'SearchCtrl'
                     }
                 }
@@ -71,27 +71,8 @@ angular.module('sb', ['ionic', 'sb.controllers', 'sb.services', 'sb.filters', 'n
                 url: '/search/:result',
                 views: {
                     'tab-search': {
-                        templateUrl: 'templates/search-detail.html',
-                        controller: 'SearchDetailCtrl'
-                    }
-                }
-            })
-
-            .state('tab.chats', {
-                url: '/chats',
-                views: {
-                    'tab-chats': {
-                        templateUrl: 'templates/tab-chats.html',
-                        controller: 'ChatsCtrl'
-                    }
-                }
-            })
-            .state('tab.chat-detail', {
-                url: '/chats/:result',
-                views: {
-                    'tab-chats': {
                         templateUrl: 'templates/chat-detail.html',
-                        controller: 'ChatDetailCtrl'
+                        controller: 'SearchDetailCtrl'
                     }
                 }
             })

@@ -1,6 +1,6 @@
 angular.module('sb.controllers', ['ngResource'])
 
-    .controller('SearchCtrl', function ($scope, spotifyAPI, Chats, $resource) {
+    .controller('SearchCtrl', function($scope, $resource) {
 
         $scope.currentSearchList = {};
 
@@ -20,67 +20,70 @@ angular.module('sb.controllers', ['ngResource'])
         }
     })
 
-    .controller('SearchDetailCtrl', function ($scope, spotifyAPI, Chats, $resource) {
+    .controller('SearchDetailCtrl', function($scope, $stateParams, $resource, $ionicLoading, nfcService) {
 
-        $scope.currentSearchList = {};
+        $scope.spotify_uri = {};
+        $scope.spotify_uri.uri = $stateParams.result;
+        $scope.spotify_uri.array = splitPayload($scope.spotify_uri.uri);
 
-        $scope.search = function (input) {
-            $scope.encodedInput = encodeURI(input);
+        var spotifyAPI = $resource($scope.uri);
 
-            var spotifyAPI = $resource('https://api.spotify.com/v1/search?q=:encodedInput&type=:type', {encodedInput: '@encodedInput'}, {type: '@type'});
+        $scope.content = {};
+        getContent($scope.spotify_uri.array);
 
-            spotifyAPI.get({encodedInput: $scope.encodedInput, type: 'track'}).$promise.then(function (result) {
+        function splitPayload(spotify_uri) {
+            return spotify_uri.split(':');
+        }
 
-                cordova.plugins.Keyboard.close();
-                $scope.results = result.tracks.items;
+        function getContent(spotify_array) {
+            var spotifyAPI = $resource('https://api.spotify.com/v1/:type/:id', {type: '@type'}, {id: '@id'});
 
+            console.log(spotify_array);
+            spotifyAPI.get({type: spotify_array[1] + 's', id: spotify_array[2]}).$promise.then(function (content) {
+                // success
+
+                $scope.content = {};
+
+                $scope.content.uri = $scope.spotify_uri.uri;
+                $scope.content.name = content.name;
+                $scope.content.artists = content.artists;
+                $scope.content.album = content.album.name;
+                $scope.content.cover = content.album.images[1].url;
+
+                console.log($scope.content);
             }, function (errResponse) {
                 console.log('error');
             });
         }
-    })
 
-    .controller('ChatsCtrl', function($scope, Chats, $resource) {
-
-        $scope.currentSearchList = {};
-
-        $scope.search = function (input) {
-            $scope.encodedInput = encodeURI(input);
-
-            var spotifyAPI = $resource('https://api.spotify.com/v1/search?q=:encodedInput&type=:type', {encodedInput: '@encodedInput'}, {type: '@type'});
-
-            spotifyAPI.get({encodedInput: $scope.encodedInput, type: 'track'}).$promise.then(function (result) {
-
-                cordova.plugins.Keyboard.close();
-                $scope.results = result.tracks.items;
-
-            }, function (errResponse) {
-                console.log('error');
+        $scope.show = function () {
+            $ionicLoading.show({
+                template: '<p>Loading...</p><ion-spinner></ion-spinner>'
             });
-        }
-    })
+        };
 
-    .controller('ChatDetailCtrl', function($scope, $stateParams) {
+        $scope.hide = function () {
+            $ionicLoading.hide();
+        };
+        $scope.write = function (spotify_uri) {
+            /*console.log(spotify_uri);
+             nfcService.writeTag(spotify_uri).then(function (data) {
+             console.log("Writing success : " + data)
+             }, function (error) {
+             console.log("Writing error : " + error)
+             })*/
 
-        console.log($stateParams.result);
 
-        console.log($scope.uri);
-       /* var spotifyAPI = $resource($scope.uri);
+            $scope.show($ionicLoading);
 
-        spotifyAPI.get().$promise.then(function (content) {
-            // success
+            $scope.messages = nfcService.writeUri(spotify_uri).then(function (data) {
+                console.log("data : " + data);
+            }).finally(function ($ionicLoading) {
+                $scope.hide($ionicLoading);
+            })
 
-            $scope.content = {};
+        };
 
-            $scope.content.name = content.name;
-            $scope.content.artists = content.artists;
-            $scope.content.album = content.album.name;
-            $scope.content.cover = content.album.images[1].url;
-
-            console.log($scope.content);
-        }, function (errResponse) {
-            console.log('error');
-        });*/
     })
 
     .controller('EditCtrl', function ($scope, $ionicLoading, nfcService) {
@@ -173,6 +176,7 @@ angular.module('sb.controllers', ['ngResource'])
                 $scope.content.album = content.album.name;
                 $scope.content.cover = content.album.images[1].url;
 
+                return content;
                 console.log($scope.content);
             }, function (errResponse) {
                 console.log('error');
