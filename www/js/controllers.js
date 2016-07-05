@@ -86,8 +86,10 @@ angular.module('starter.controllers', [])
         $scope.chat = Chats.get($stateParams.chatId);
     })
 
-    .controller('ReadCtrl', function ($scope) {
-        $scope.settings = {
-            enableFriends: true
-        };
+    .controller('ReadCtrl', function ($scope,$ionicLoading,  nfcService) {
+
+        $scope.tag = nfcService.readUri().then(function (data) {
+            console.log("data : " + data);
+            $scope.tag = data;
+        })
     });

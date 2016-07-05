@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
+angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'nfcFilters'])
 
     .run(function ($ionicPlatform) {
         $ionicPlatform.ready(function () {
@@ -137,8 +137,28 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
             return deferred.promise;
         };
 
+        var readUri = function () {
+            var deferred = $q.defer();
+
+            nfc.addNdefListener(function (nfcEvent) {
+
+                //console.log(JSON.stringify(nfcEvent));
+                console.log("Read tag : " + JSON.stringify(nfcEvent.tag.id, null, 4));
+
+                deferred.resolve(nfcEvent.tag);
+
+            }, function () {
+                console.log("Listening for NDEF Tags.");
+            }, function (reason) {
+                alert("Error adding NFC Listener " + reason);
+            });
+
+            return deferred.promise;
+        };
+
         return {
-            writeUri: writeUri
+            writeUri: writeUri,
+            readUri: readUri
         };
 
     });
