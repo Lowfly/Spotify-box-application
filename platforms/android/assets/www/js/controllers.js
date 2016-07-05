@@ -1,42 +1,42 @@
 angular.module('sb.controllers', ['ngResource'])
 
-    .controller('SearchCtrl', function ($scope, spotifyAPI) {
-
+    .controller('SearchCtrl', function ($scope, spotifyAPI, Chats, $resource) {
 
         $scope.currentSearchList = {};
 
-        $scope.spotifysearch = function (type, content) {
+        $scope.search = function (input) {
+            $scope.encodedInput = encodeURI(input);
 
-            console.log("passe");
-            if (type == 1) {
-                spotifyAPI.searchTrack(content)
-                    .then(function (response) {
-                        $scope.currentSearchList = response.data;
-                        console.log($scope.currentSearchList);
-                    }, function (error) {
-                        $scope.status = 'Unable to load customer data: ' + error.message;
-                    });
-            }
-            else if (type == 2) {
-                spotifyAPI.searchAlbum(content)
-                    .then(function (response) {
-                        $scope.currentSearchList = response.data;
-                        console.log($scope.currentSearchList);
+            var spotifyAPI = $resource('https://api.spotify.com/v1/search?q=:encodedInput&type=:type', {encodedInput: '@encodedInput'}, {type: '@type'});
 
-                    }, function (error) {
-                        $scope.status = 'Unable to load customer data: ' + error.message;
-                    });
-            }
-            else if (type == 3) {
-                spotifyAPI.searchPlaylist(content)
-                    .then(function (response) {
-                        $scope.currentSearchList = response.data;
-                        console.log($scope.currentSearchList);
+            spotifyAPI.get({encodedInput: $scope.encodedInput, type: 'track'}).$promise.then(function (result) {
 
-                    }, function (error) {
-                        $scope.status = 'Unable to load customer data: ' + error.message;
-                    });
-            }
+                cordova.plugins.Keyboard.close();
+                $scope.results = result.tracks.items;
+
+            }, function (errResponse) {
+                console.log('error');
+            });
+        }
+    })
+
+    .controller('SearchDetailCtrl', function ($scope, spotifyAPI, Chats, $resource) {
+
+        $scope.currentSearchList = {};
+
+        $scope.search = function (input) {
+            $scope.encodedInput = encodeURI(input);
+
+            var spotifyAPI = $resource('https://api.spotify.com/v1/search?q=:encodedInput&type=:type', {encodedInput: '@encodedInput'}, {type: '@type'});
+
+            spotifyAPI.get({encodedInput: $scope.encodedInput, type: 'track'}).$promise.then(function (result) {
+
+                cordova.plugins.Keyboard.close();
+                $scope.results = result.tracks.items;
+
+            }, function (errResponse) {
+                console.log('error');
+            });
         }
     })
 
@@ -82,9 +82,6 @@ angular.module('sb.controllers', ['ngResource'])
     })
 
 
-    .controller('ChatDetailCtrl', function ($scope, $stateParams, Chats) {
-        $scope.chat = Chats.get($stateParams.chatId);
-    })
 
     .controller('ReadCtrl', function ($scope, $ionicLoading, $resource, nfcService) {
         $scope.spotify_uri = {};
@@ -96,7 +93,7 @@ angular.module('sb.controllers', ['ngResource'])
 
             $scope.spotify_uri.array = splitPayload($scope.spotify_uri.uri);
 
-            if (!isValidUri($scope.spotify_uri.array)){
+            if (!isValidUri($scope.spotify_uri.array)) {
                 alert("Tag ou URI non valide");
                 return;
             }
@@ -123,14 +120,10 @@ angular.module('sb.controllers', ['ngResource'])
         function getContent(spotify_array) {
             var spotifyAPI = $resource('https://api.spotify.com/v1/:type/:id', {type: '@type'}, {id: '@id'});
 
-            spotifyAPI.get({type: spotify_array[1] + 's', id: spotify_array[2]}).$promise.then(function(content) {
+            spotifyAPI.get({type: spotify_array[1] + 's', id: spotify_array[2]}).$promise.then(function (content) {
                 // success
 
                 $scope.content = {};
-                console.log(content.name);
-                console.log(content.artists);
-                console.log(content.album.name);
-                console.log(content.album.images[1].url);
 
                 $scope.content.name = content.name;
                 $scope.content.artists = content.artists;
@@ -138,11 +131,10 @@ angular.module('sb.controllers', ['ngResource'])
                 $scope.content.cover = content.album.images[1].url;
 
                 console.log($scope.content);
-            }, function(errResponse) {
+            }, function (errResponse) {
                 console.log('error');
             });
         }
 
 
-    })
-;
+    });

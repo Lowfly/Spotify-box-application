@@ -45,15 +45,7 @@ angular.module('sb', ['ionic', 'sb.controllers', 'sb.services', 'sb.filters', 'n
 
             // Each tab has its own nav history stack:
 
-            .state('tab.search', {
-                url: '/search',
-                views: {
-                    'tab-search': {
-                        templateUrl: 'templates/tab-search.html',
-                        controller: 'SearchCtrl'
-                    }
-                }
-            })
+
 
             .state('tab.edit', {
                 url: '/edit',
@@ -64,12 +56,23 @@ angular.module('sb', ['ionic', 'sb.controllers', 'sb.services', 'sb.filters', 'n
                     }
                 }
             })
-            .state('tab.chat-detail', {
-                url: '/chats/:chatId',
+
+            .state('tab.search', {
+                url: '/search',
                 views: {
-                    'tab-chats': {
-                        templateUrl: 'templates/chat-detail.html',
-                        controller: 'ChatDetailCtrl'
+                    'tab-search': {
+                        templateUrl: 'templates/tab-search.html',
+                        controller: 'SearchCtrl'
+                    }
+                }
+            })
+
+            .state('tab.search-detail', {
+                url: '/search/:result',
+                views: {
+                    'tab-search': {
+                        templateUrl: 'templates/search-detail.html',
+                        controller: 'SearchDetailCtrl'
                     }
                 }
             })
