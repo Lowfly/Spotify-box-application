@@ -1,7 +1,6 @@
 angular.module('sb.controllers', ['ngResource'])
 
 
-
     .controller('SearchCtrl', function ($scope, $resource, $ionicLoading, nfcService) {
 
         $scope.currentSearchList = {};
@@ -97,21 +96,14 @@ angular.module('sb.controllers', ['ngResource'])
             $ionicLoading.hide();
         };
         $scope.write = function (spotify_uri) {
-            /*console.log(spotify_uri);
-             nfcService.writeTag(spotify_uri).then(function (data) {
-             console.log("Writing success : " + data)
-             }, function (error) {
-             console.log("Writing error : " + error)
-             })*/
-
 
             $scope.show($ionicLoading);
 
             $scope.messages = nfcService.writeUri(spotify_uri).then(function (data) {
                 console.log("data : " + data);
             }).finally(function ($ionicLoading) {
-                nfc.removeNdefListener($scope.hide($ionicLoading), function(){console.log("sucess remove");}, function(){console.log("failure remove");});
-
+                $scope.hide($ionicLoading);
+                nfcService.closeHandle();
             })
 
         };
@@ -119,13 +111,7 @@ angular.module('sb.controllers', ['ngResource'])
     })
 
     .controller('EditCtrl', function ($scope, $ionicLoading, nfcService) {
-        // With the new view caching in Ionic, Controllers are only called
-        // when they are recreated or on app start, instead of every page change.
-        // To listen for when this page is active (for example, to refresh data),
-        // listen for the $ionicView.enter event:
-        //
-        //$scope.$on('$ionicView.enter', function(e) {
-        //});
+
         $scope.show = function () {
             $ionicLoading.show({
                 template: '<p>Waiting tag...</p><ion-spinner icon="ripple"></ion-spinner>'
@@ -137,12 +123,6 @@ angular.module('sb.controllers', ['ngResource'])
         };
 
         $scope.write = function (spotify_uri) {
-            /*console.log(spotify_uri);
-             nfcService.writeTag(spotify_uri).then(function (data) {
-             console.log("Writing success : " + data)
-             }, function (error) {
-             console.log("Writing error : " + error)
-             })*/
 
             cordova.plugins.Keyboard.close();
 

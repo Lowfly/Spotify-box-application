@@ -22,12 +22,12 @@ angular.module('sb.services', [])
     .factory('nfcService', function ($rootScope, $q, $ionicPlatform) {
 
         console.log("into service");
-        $ionicPlatform.ready(function() {
+        $ionicPlatform.ready(function () {
             console.log("ready");
             nfc.addNdefListener(function (nfcEvent) {
                 console.log("TAG");
                 console.log(nfcEvent)
-                $rootScope.$apply(function(){
+                $rootScope.$apply(function () {
                     angular.copy(nfcEvent.tag, $rootScope.tag);
                 });
             }, function () {
@@ -84,7 +84,22 @@ angular.module('sb.services', [])
             return deferred.promise;
         };
 
+        var closeHandle = function () {
+            nfc.removeNdefListener(function () {
+                    console.log("do something");
+                }, function () {
+                    console.log("Sucess return");
+
+                }, function (error) {
+                    console.log(error);
+                }
+            );
+        };
+
+
         return {
+            closeHandle: closeHandle,
+
             writeUri: writeUri,
             readUri: readUri
         };
