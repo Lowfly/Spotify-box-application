@@ -1,4 +1,5 @@
 <ion-view view-title="Account">
+
     <ion-content>
         <div ng-if="!tag.id">
             <div class="card">
@@ -8,6 +9,9 @@
             </div>
         </div>
         <div ng-if="tag.id">
+            <button class="button button-block button-stable ion-android-arrow-down" ng-click="readNewTag()">
+                Read a new tag
+            </button>
             <div class="card" style='text-align: center; padding: 20px'>
                 <img src={{content.cover}} alt="Smiley face" height="250" width="250" align="middle">
 

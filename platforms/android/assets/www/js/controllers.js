@@ -2,7 +2,7 @@ angular.module('sb.controllers', ['ngResource'])
 
 
 
-    .controller('SearchCtrl', function ($scope, $resource, $ionicLoading) {
+    .controller('SearchCtrl', function ($scope, $resource, $ionicLoading, nfcService) {
 
         $scope.currentSearchList = {};
 
@@ -110,7 +110,8 @@ angular.module('sb.controllers', ['ngResource'])
             $scope.messages = nfcService.writeUri(spotify_uri).then(function (data) {
                 console.log("data : " + data);
             }).finally(function ($ionicLoading) {
-                $scope.hide($ionicLoading);
+                nfc.removeNdefListener($scope.hide($ionicLoading), function(){console.log("sucess remove");}, function(){console.log("failure remove");});
+
             })
 
         };
@@ -159,10 +160,14 @@ angular.module('sb.controllers', ['ngResource'])
     })
 
 
-    .controller('ReadCtrl', function ($scope, $ionicLoading, $resource, nfcService, $sce) {
+    .controller('ReadCtrl', function ($rootScope, $scope, $ionicLoading, $resource, nfcService, $sce) {
         $scope.spotify_uri = {};
 
+        $rootScope.tag = {};
+
         $scope.tag = nfcService.readUri().then(function (data) {
+
+            console.log("URI");
             $scope.tag = data;
 
             $scope.spotify_uri.uri = ndef.uriHelper.decodePayload($scope.tag.ndefMessage[0].payload);
@@ -181,6 +186,27 @@ angular.module('sb.controllers', ['ngResource'])
             return $sce.trustAsResourceUrl('https://embed.spotify.com/?uri=' + $scope.spotify_uri.uri);
         };
 
+        $scope.readNewTag = function(){
+
+            $scope.tag = nfcService.readUri().then(function (data) {
+
+                console.log("URI");
+                $scope.tag = data;
+
+                $scope.spotify_uri.uri = ndef.uriHelper.decodePayload($scope.tag.ndefMessage[0].payload);
+
+                $scope.spotify_uri.array = splitPayload($scope.spotify_uri.uri);
+
+                if (!isValidUri($scope.spotify_uri.array)) {
+                    alert("Tag ou URI non valide");
+                    return;
+                }
+
+                getContent($scope.spotify_uri.array);
+            });
+
+        };
+
         function isValidUri(spotify_array) {
             console.log(spotify_array.length);
             if (spotify_array.length == 3) {
@@ -196,7 +222,11 @@ angular.module('sb.controllers', ['ngResource'])
             return spotify_uri.split(':');
         }
 
+        $scope.clear = function(){
+
+        };
         function getContent(spotify_array) {
+            console.log("GET CONTENT");
             var spotifyAPI = $resource('https://api.spotify.com/v1/:type/:id', {type: '@type'}, {id: '@id'});
 
             spotifyAPI.get({type: spotify_array[1] + 's', id: spotify_array[2]}).$promise.then(function (content) {
@@ -214,7 +244,6 @@ angular.module('sb.controllers', ['ngResource'])
                     content.cover = "https://pixabay.com/static/uploads/photo/2014/09/26/10/45/delete-462216_960_720.png"
                 }
                 return content;
-                console.log($scope.content);
             }, function (errResponse) {
                 console.log('error');
             });

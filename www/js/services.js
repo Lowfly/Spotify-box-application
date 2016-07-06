@@ -19,7 +19,24 @@ angular.module('sb.services', [])
         return spotifyFactory;
     }])
 
-    .factory('nfcService', function ($q, $timeout) {
+    .factory('nfcService', function ($rootScope, $q, $ionicPlatform) {
+
+        console.log("into service");
+        $ionicPlatform.ready(function() {
+            console.log("ready");
+            nfc.addNdefListener(function (nfcEvent) {
+                console.log("TAG");
+                console.log(nfcEvent)
+                $rootScope.$apply(function(){
+                    angular.copy(nfcEvent.tag, $rootScope.tag);
+                });
+            }, function () {
+                console.log("Listening for NDEF Tags.");
+            }, function (reason) {
+                alert("Error adding NFC Listener " + reason);
+            });
+
+        });
 
         var writeUri = function (spotify_uri) {
             var deferred = $q.defer();
@@ -32,6 +49,7 @@ angular.module('sb.services', [])
                 var message = [ndef.uriRecord(spotify_uri)];
                 nfc.write(message, function () {
                     console.log("success");
+
                     deferred.resolve(nfcEvent);
                 }, function () {
                     console.log("failure");
