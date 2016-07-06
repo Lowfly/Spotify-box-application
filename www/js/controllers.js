@@ -1,26 +1,57 @@
 angular.module('sb.controllers', ['ngResource'])
 
-    .controller('SearchCtrl', function($scope, $resource) {
+
+
+    .controller('SearchCtrl', function ($scope, $resource, $ionicLoading) {
 
         $scope.currentSearchList = {};
 
+        $scope.show = function () {
+            $ionicLoading.show({
+                template: '<p>Browsing Spotify...</p><ion-spinner></ion-spinner>'
+            });
+        };
+
+        $scope.hide = function () {
+            $ionicLoading.hide();
+        };
+
         $scope.search = function (input) {
-            $scope.encodedInput = encodeURI(input);
 
-            var spotifyAPI = $resource('https://api.spotify.com/v1/search?q=:encodedInput&type=:type', {encodedInput: '@encodedInput'}, {type: '@type'});
+            $scope.input = input;
+            cordova.plugins.Keyboard.close();
+            $scope.show($ionicLoading);
 
-            spotifyAPI.get({encodedInput: $scope.encodedInput, type: 'track'}).$promise.then(function (result) {
 
-                cordova.plugins.Keyboard.close();
+            var spotifyAPI = $resource('https://api.spotify.com/v1/search?q=:input&type=:type', {input: '@input'}, {type: '@type'});
+            spotifyAPI.get({input: $scope.input, type: 'track'}).$promise.then(function (result) {
+
                 $scope.results = result.tracks.items;
+                if ($scope.results.length == 0) {
+
+                    console.log('empty');
+                    $scope.results = [{
+                        'name': 'No tracks match your search',
+                        'album': {
+                            'images': [
+                                {'url': 'https://pixabay.com/static/uploads/photo/2014/09/26/10/45/delete-462216_960_720.png'},
+                                {'url': 'https://pixabay.com/static/uploads/photo/2014/09/26/10/45/delete-462216_960_720.png'},
+                                {'url': 'https://pixabay.com/static/uploads/photo/2014/09/26/10/45/delete-462216_960_720.png'}
+                            ]
+                        }
+                    }];
+                }
+                $scope.hide($ionicLoading);
 
             }, function (errResponse) {
+                $scope.hide($ionicLoading);
+
                 console.log('error');
             });
         }
     })
 
-    .controller('SearchDetailCtrl', function($scope, $stateParams, $resource, $ionicLoading, nfcService) {
+    .controller('SearchDetailCtrl', function ($scope, $stateParams, $resource, $ionicLoading, nfcService) {
 
         $scope.spotify_uri = {};
         $scope.spotify_uri.uri = $stateParams.result;
@@ -58,7 +89,7 @@ angular.module('sb.controllers', ['ngResource'])
 
         $scope.show = function () {
             $ionicLoading.show({
-                template: '<p>Loading...</p><ion-spinner></ion-spinner>'
+                template: '<p>Waiting tag...</p><ion-spinner icon="ripple"></ion-spinner>'
             });
         };
 
@@ -96,7 +127,7 @@ angular.module('sb.controllers', ['ngResource'])
         //});
         $scope.show = function () {
             $ionicLoading.show({
-                template: '<p>Loading...</p><ion-spinner></ion-spinner>'
+                template: '<p>Waiting tag...</p><ion-spinner icon="ripple"></ion-spinner>'
             });
         };
 
@@ -128,8 +159,7 @@ angular.module('sb.controllers', ['ngResource'])
     })
 
 
-
-    .controller('ReadCtrl', function ($scope, $ionicLoading, $resource, nfcService) {
+    .controller('ReadCtrl', function ($scope, $ionicLoading, $resource, nfcService, $sce) {
         $scope.spotify_uri = {};
 
         $scope.tag = nfcService.readUri().then(function (data) {
@@ -147,6 +177,9 @@ angular.module('sb.controllers', ['ngResource'])
             getContent($scope.spotify_uri.array);
         });
 
+        $scope.getIframe = function() {
+            return $sce.trustAsResourceUrl('https://embed.spotify.com/?uri=' + $scope.spotify_uri.uri);
+        };
 
         function isValidUri(spotify_array) {
             console.log(spotify_array.length);
@@ -171,11 +204,15 @@ angular.module('sb.controllers', ['ngResource'])
 
                 $scope.content = {};
 
+                $scope.content.uri = content.uri;
                 $scope.content.name = content.name;
                 $scope.content.artists = content.artists;
                 $scope.content.album = content.album.name;
                 $scope.content.cover = content.album.images[1].url;
 
+                if (!content.name){
+                    content.cover = "https://pixabay.com/static/uploads/photo/2014/09/26/10/45/delete-462216_960_720.png"
+                }
                 return content;
                 console.log($scope.content);
             }, function (errResponse) {
